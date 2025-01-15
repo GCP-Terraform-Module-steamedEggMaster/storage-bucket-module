@@ -4,9 +4,11 @@ resource "google_storage_bucket" "storage_bucket" {
   location = var.location # 버킷이 생성될 GCP 리전 또는 멀티-리전 (예: US, ASIA, EUROPE)
 
   # 선택적 설정
-  force_destroy               = var.force_destroy               # 버킷 삭제 시 내부 객체도 함께 삭제할지 여부 설정 (기본값: false)
-  project                     = var.project                     # 버킷이 속한 GCP 프로젝트 ID (지정하지 않으면 기본 프로젝트 사용)
-  storage_class               = var.storage_class               # 저장소 클래스 (예: STANDARD, NEARLINE, COLDLINE 등, 기본값: STANDARD)
+  force_destroy               = var.force_destroy # 버킷 삭제 시 내부 객체도 함께 삭제할지 여부 설정 (기본값: false)
+  project                     = var.project       # 버킷이 속한 GCP 프로젝트 ID (지정하지 않으면 기본 프로젝트 사용)
+  storage_class               = var.storage_class # 저장소 클래스 (예: STANDARD, NEARLINE, COLDLINE 등, 기본값: STANDARD)
+  labels                      = var.labels
+  requester_pays              = var.requester_pays
   uniform_bucket_level_access = var.uniform_bucket_level_access # 버킷 전체에 통일된 IAM 정책 적용 여부 설정
   public_access_prevention    = var.public_access_prevention    # 버킷의 공개 접근 방지 수준 ("inherited" 또는 "enforced")
 
