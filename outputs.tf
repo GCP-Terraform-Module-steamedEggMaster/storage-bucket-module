@@ -58,7 +58,7 @@ output "labels" {
 
 output "encryption_key" {
   description = "GCS 버킷의 기본 암호화 KMS 키"
-  value       = google_storage_bucket.storage_bucket.encryption[0].default_kms_key_name
+  value       = try(google_storage_bucket.storage_bucket.encryption[0].default_kms_key_name, null)
 }
 
 output "retention_policy" {
