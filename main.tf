@@ -1,4 +1,4 @@
-resource "google_storage_bucket" "bucket" {
+resource "google_storage_bucket" "storage_bucket" {
   # 필수 설정
   name     = var.name     # 버킷 이름
   location = var.location # 버킷 생성 위치
