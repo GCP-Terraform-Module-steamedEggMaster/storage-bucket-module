@@ -2,7 +2,7 @@ module "bucket" {
   source = "../../"
 
   # 필수 변수
-  name          = "test-bucket"     # GCS 버킷 이름
+  name          = "test-bucket-module123456"     # GCS 버킷 이름
   location      = "ASIA-NORTHEAST3" # 버킷 생성 위치 (서울 리전)
   storage_class = "STANDARD"        # 스토리지 클래스 (예: STANDARD, NEARLINE 등)
 
