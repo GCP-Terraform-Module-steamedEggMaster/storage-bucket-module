@@ -1,85 +1,120 @@
-resource "google_storage_bucket" "bucket" {
-  # 필수 설정
-  name     = var.name     # 버킷 이름
-  location = var.location # 버킷 생성 위치
+variable "name" {
+  description = "GCS 버킷 이름"
+  type        = string
+}
 
-  # 선택적 설정
-  force_destroy = var.force_destroy # 객체 강제 삭제 여부 (기본값: false)
-  project       = var.project       # GCP 프로젝트 ID
-  storage_class = var.storage_class # 스토리지 클래스 (기본값: "STANDARD")
+variable "location" {
+  description = "GCS 버킷 위치"
+  type        = string
+}
 
-  # 버킷 레이블
-  labels = var.labels
+variable "force_destroy" {
+  description = "버킷 삭제 시 객체 강제 삭제 여부"
+  type        = bool
+  default     = false
+}
 
-  # 버킷 암호화 설정
-  dynamic "encryption" {
-    for_each = var.encryption != null ? [var.encryption] : []
-    content {
-      default_kms_key_name = encryption.value.default_kms_key_name
-    }
-  }
+variable "project" {
+  description = "GCP 프로젝트 ID"
+  type        = string
+  default     = null
+}
 
-  # 버킷 버전 관리 설정
-  dynamic "versioning" {
-    for_each = var.versioning != null ? [var.versioning] : []
-    content {
-      enabled = versioning.value.enabled
-    }
-  }
+variable "storage_class" {
+  description = "GCS 버킷의 스토리지 클래스"
+  type        = string
+  default     = "STANDARD"
+}
 
-  # 버킷 라이프사이클 규칙 설정
-  dynamic "lifecycle_rule" {
-    for_each = var.lifecycle_rules
-    content {
-      action {
-        type          = lifecycle_rule.value.action.type
-        storage_class = lookup(lifecycle_rule.value.action, "storage_class", null)
-      }
-      condition {
-        age                        = lookup(lifecycle_rule.value.condition, "age", null)
-        created_before             = lookup(lifecycle_rule.value.condition, "created_before", null)
-        matches_storage_class      = lookup(lifecycle_rule.value.condition, "matches_storage_class", null)
-        with_state                 = lookup(lifecycle_rule.value.condition, "with_state", null)
-        matches_prefix             = lookup(lifecycle_rule.value.condition, "matches_prefix", null)
-        matches_suffix             = lookup(lifecycle_rule.value.condition, "matches_suffix", null)
-        days_since_noncurrent_time = lookup(lifecycle_rule.value.condition, "days_since_noncurrent_time", null)
-      }
-    }
-  }
+variable "labels" {
+  description = "GCS 버킷에 추가할 레이블"
+  type        = map(string)
+  default     = {}
+}
 
-  # CORS 설정
-  dynamic "cors" {
-    for_each = var.cors
-    content {
-      origin          = cors.value.origin
-      method          = cors.value.method
-      response_header = cors.value.response_header
-      max_age_seconds = cors.value.max_age_seconds
-    }
-  }
+variable "encryption" {
+  description = "GCS 버킷의 암호화 설정"
+  type = object({
+    default_kms_key_name = string
+  })
+  default = null
+}
 
-  # 버킷 로그 설정
-  dynamic "logging" {
-    for_each = var.logging != null ? [var.logging] : []
-    content {
-      log_bucket        = logging.value.log_bucket
-      log_object_prefix = lookup(logging.value, "log_object_prefix", null)
-    }
-  }
+variable "versioning" {
+  description = "GCS 버킷 버전 관리 설정"
+  type = object({
+    enabled = bool
+  })
+  default = null
+}
 
-  # 버킷 웹사이트 설정
-  dynamic "website" {
-    for_each = var.website != null ? [var.website] : []
-    content {
-      main_page_suffix = website.value.main_page_suffix
-      not_found_page   = website.value.not_found_page
-    }
-  }
+variable "lifecycle_rules" {
+  description = "GCS 버킷 라이프사이클 규칙"
+  type = list(
+    object({
+      action = object({
+        type          = string
+        storage_class = optional(string)
+      })
+      condition = object({
+        age                        = optional(number)
+        created_before             = optional(string)
+        matches_storage_class      = optional(list(string))
+        with_state                 = optional(string)
+        matches_prefix             = optional(list(string))
+        matches_suffix             = optional(list(string))
+        days_since_noncurrent_time = optional(number)
+      })
+    })
+  )
+  default = []
+}
 
-  # 타임아웃 설정
-  timeouts {
-    create = var.timeout_create
-    update = var.timeout_update
-    delete = var.timeout_delete
-  }
+variable "cors" {
+  description = "GCS 버킷의 CORS 설정"
+  type = list(
+    object({
+      origin          = list(string)
+      method          = list(string)
+      response_header = list(string)
+      max_age_seconds = number
+    })
+  )
+  default = []
+}
+
+variable "logging" {
+  description = "GCS 버킷 로그 설정"
+  type = object({
+    log_bucket        = string
+    log_object_prefix = optional(string)
+  })
+  default = null
+}
+
+variable "website" {
+  description = "GCS 버킷 웹사이트 설정"
+  type = object({
+    main_page_suffix = optional(string)
+    not_found_page   = optional(string)
+  })
+  default = null
+}
+
+variable "timeout_create" {
+  description = "생성 타임아웃"
+  type        = string
+  default     = "4m"
+}
+
+variable "timeout_update" {
+  description = "업데이트 타임아웃"
+  type        = string
+  default     = "4m"
+}
+
+variable "timeout_delete" {
+  description = "삭제 타임아웃"
+  type        = string
+  default     = "4m"
 }
