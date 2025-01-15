@@ -35,19 +35,19 @@ output "storage_class" {
 
 output "lifecycle_rule" {
   description = "GCS 버킷에 적용된 라이프사이클 규칙"
-  value       = google_storage_bucket.storage_bucket.lifecycle_rule
+  value       = try(google_storage_bucket.storage_bucket.lifecycle_rule, [])
 }
 
 output "versioning_enabled" {
   description = "GCS 버킷 버전 관리 활성화 여부"
-  value       = google_storage_bucket.storage_bucket.versioning[0].enabled
+  value       = try(google_storage_bucket.storage_bucket.versioning[0].enabled, false)
 }
 
 output "logging_config" {
   description = "GCS 버킷의 로그 설정"
   value = {
-    log_bucket        = google_storage_bucket.storage_bucket.logging[0].log_bucket
-    log_object_prefix = google_storage_bucket.storage_bucket.logging[0].log_object_prefix
+    log_bucket        = try(google_storage_bucket.storage_bucket.logging[0].log_bucket, null)
+    log_object_prefix = try(google_storage_bucket.storage_bucket.logging[0].log_object_prefix, null)
   }
 }
 
@@ -64,7 +64,7 @@ output "encryption_key" {
 output "retention_policy" {
   description = "GCS 버킷의 데이터 보존 정책"
   value = {
-    is_locked        = google_storage_bucket.storage_bucket.retention_policy[0].is_locked
-    retention_period = google_storage_bucket.storage_bucket.retention_policy[0].retention_period
+    is_locked        = try(google_storage_bucket.storage_bucket.retention_policy[0].is_locked, false)
+    retention_period = try(google_storage_bucket.storage_bucket.retention_policy[0].retention_period, null)
   }
 }
